@@ -1,5 +1,3 @@
-docker-compose up -d
-
 // build with no cache
 docker-compose build --no-cache
 // start the services
