@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+  mysqldb:
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    image: mysql:5.7
+    restart: always
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - backend
+
+  backend:
+    depends_on:
+      - mysqldb
+    command: ["./wait-for-it.sh", "mysql:3306", "--", "-url=jdbc:mysql://my_sql_db:3306/abhs?useUnicode=true&characterEncoding=utf8&useSSL=false -user=root -password=password migrate"]
+    build: ./backend
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - DB_HOST=mysqldb
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - DB_NAME=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+     # - CLIENT_ORIGIN=$CLIENT_ORIGIN
+      
+    networks:
+      - backend
+      - frontend
+
+  frontend:
+    depends_on:
+      - backend
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_ROUTES=$CLIENT_API_BASE_URL
+    ports:
+      - '3000:3000'
+    stdin_open: true
+    networks:
+      - frontend
+volumes: #define our mysql volume used above
+  mysql:
+
+networks:
+  backend:
+    driver: bridge
+    internal: true
+  frontend:
+    driver: bridge
