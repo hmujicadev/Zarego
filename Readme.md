@@ -11,4 +11,8 @@ docker ps
 // stop services
 docker-compose stop
 
-Esta dando un problema el docker
+Para inicializar el proyecto deben usar:
+
+  docker-compose up -d
+
+Esta dando un problema el docker con respecto a la asyncronia entre el inicio de mysql y el backend...
