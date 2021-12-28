@@ -37,9 +37,6 @@ router.route(`/:status?/:page?`)
       pagesTotal = parseInt(rowsCount / 10);
      
       if ((pagesTotal % 1) !== 0) {
-        console.log(pagesTotal % 1)
-        console.log((pagesTotal % 1) !== 0)
-
         pagesTotal = (pagesTotal+1);
       } 
     })
@@ -60,7 +57,6 @@ router.route(`/:status?/:page?`)
   })
   .post( async function (req, res) {
     let { id, title, description, status, updated_at } = req.body;
-    console.log(req.body)
     const date = getTimeStamp()
     if (!id) {
       await mysqlConnection.query(`INSERT INTO tasks (title, description, status, created_at, updated_at) VALUES ('${title}', '${description}', '${status}',${date}, ${date})`), function (err, rows, fields) {       
